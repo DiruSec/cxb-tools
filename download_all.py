@@ -1,33 +1,36 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-import os, sys
-from urllib.request import urlopen
+import os, sys, getopt, urllib.request
 
 APP_BASE_DIR = "64_06_4B66B35C"
 BASE_URL = "https://cxb-dl.ac.capcom.jp"
 STATIC_FILES = ["config/config_11600.json"]
 
-def downloadProgress(bytes_so_far, total_size, currentFile):
-   percent = float(bytes_so_far) / total_size
+def downloadProgress(currentBytes, totalSize, currentFile):
+   percent = float(currentBytes) / totalSize
    percent = round(percent*100, 2)
    sys.stdout.write("\r" + currentFile + "...%d%%" % percent)
 
-   if bytes_so_far >= total_size:
+   if currentBytes >= totalSize:
       sys.stdout.write('\n')
 
 def downloadFile(url, currentFile):
-    response = urlopen(url)
+    if (proxyPath != False):
+        proxy = urllib.request.ProxyHandler({'http' : 'http://' + proxyPath, 'https': 'https://' + proxyPath})
+        urllib.request.install_opener(urllib.request.build_opener(proxy))
+
+    response = urllib.request.urlopen(url)
     totalsize = int(response.headers['Content-Length'].strip())
-    bytes_so_far = 0
+    currentBytes = 0
         
     while 1:
         file = response.read(8192)
-        bytes_so_far += len(file)
+        currentBytes += len(file)
     
         if not file:
             break
     
-        downloadProgress(bytes_so_far, totalsize, currentFile)
+        downloadProgress(currentBytes, totalsize, currentFile)
 
     return file
 
@@ -50,8 +53,17 @@ def makeSave(path):
         print(path+"... Failed.")
     saveFile.close
 
+def checkProxy():
+    opts, args = getopt.getopt(sys.argv[1:], "p:")
+    for op, value in opts:
+        if op == "-p":
+            print ("Using proxy %s"%value)
+            return value
+    return False
+
 with open("download_file_list.txt", "r") as f:
     DownloadList = f.read().splitlines()
+    proxyPath = checkProxy()
     for files in DownloadList:
         makeSave(files)
     for files in STATIC_FILES:
