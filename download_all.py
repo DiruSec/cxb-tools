@@ -47,13 +47,13 @@ def makeSave(path):
         return
 
     with open(savePath(path),"w+b") as saveFile:
-        # try:
-        saveFile.write(downloadFile(BASE_URL+'/'+path, path))
-        saveFile.close()
-        # except KeyboardInterrupt:
-        #     sys.exit(0)
-        # except:
-        #     print(path+"... Failed.")
+        try:
+            saveFile.write(downloadFile(BASE_URL+'/'+path, path))
+            saveFile.close()
+        except KeyboardInterrupt:
+            sys.exit(0)
+        except:
+            print(path+"... Failed.")
 
 def checkProxy():
     opts, args = getopt.getopt(sys.argv[1:], "p:")
