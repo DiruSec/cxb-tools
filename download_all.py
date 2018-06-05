@@ -7,12 +7,13 @@ BASE_URL = "https://cxb-dl.ac.capcom.jp"
 STATIC_FILES = ["config/config_11600.json"]
 
 def downloadProgress(currentBytes, totalSize, currentFile):
-   percent = float(currentBytes) / totalSize
-   percent = round(percent*100, 2)
-   sys.stdout.write("\r" + currentFile + "...%d%%" % percent)
 
-   if currentBytes >= totalSize:
-      sys.stdout.write('\n')
+    percent = float(currentBytes) / totalSize
+    percent = round(percent*100, 2)
+    sys.stdout.write("\r" + currentFile + "...%d%%" % percent)
+
+    if currentBytes >= totalSize:
+        sys.stdout.write('\n')
 
 def downloadFile(url, currentFile):
     if (proxyPath != False):
@@ -52,8 +53,8 @@ def makeSave(path):
             saveFile.close()
         except KeyboardInterrupt:
             sys.exit(0)
-        except:
-            print(path+"... Failed.")
+        except Exception as e:
+            print(path+"... "+str(e))
 
 def checkProxy():
     opts, args = getopt.getopt(sys.argv[1:], "p:")
@@ -67,6 +68,7 @@ with open("download_file_list.txt", "r") as f:
     DownloadList = f.read().splitlines()
     proxyPath = checkProxy()
     for files in DownloadList:
+        files = APP_BASE_DIR + '/' + files
         makeSave(files)
     for files in STATIC_FILES:
         makeSave(files)
