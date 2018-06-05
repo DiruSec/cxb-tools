@@ -22,17 +22,19 @@ def downloadFile(url, currentFile):
     response = urllib.request.urlopen(url)
     totalsize = int(response.headers['Content-Length'].strip())
     currentBytes = 0
+    fileObject = b''
         
     while 1:
         file = response.read(8192)
+        fileObject += file
         currentBytes += len(file)
     
         if not file:
             break
-    
-        downloadProgress(currentBytes, totalsize, currentFile)
 
-    return file
+        downloadProgress(currentBytes, totalsize, currentFile)
+    
+    return fileObject
 
 def savePath(path):
     return "resource/"+path
@@ -44,14 +46,14 @@ def makeSave(path):
         print(path+"... Skipped.")
         return
 
-    saveFile = open(savePath(path),"w+b")
-    try:
+    with open(savePath(path),"w+b") as saveFile:
+        # try:
         saveFile.write(downloadFile(BASE_URL+'/'+path, path))
-    except KeyboardInterrupt:
-        sys.exit(0)
-    except:
-        print(path+"... Failed.")
-    saveFile.close
+        saveFile.close()
+        # except KeyboardInterrupt:
+        #     sys.exit(0)
+        # except:
+        #     print(path+"... Failed.")
 
 def checkProxy():
     opts, args = getopt.getopt(sys.argv[1:], "p:")
