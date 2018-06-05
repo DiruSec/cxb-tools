@@ -43,7 +43,7 @@ def savePath(path):
 def makeSave(path):
     os.makedirs(os.path.dirname(savePath(path)), exist_ok=True)
 
-    if os.path.exists(savePath(path)):
+    if os.path.exists(savePath(path)) and os.path.getsize(savePath(path)) > 0:
         print(path+"... Skipped.")
         return
 
